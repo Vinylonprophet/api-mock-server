@@ -1,6 +1,10 @@
 {
     "name": "api_mock_server",
     "version": "1.0.0",
+    "scripts": {
+        "start": "node app.js",
+        "local": "nodemon app.js"
+    },
     "dependencies": {
         "axios": "^1.6.7",
         "body-parser": "^1.20.2",
@@ -18,7 +22,8 @@
         "http-proxy-middleware": "^2.0.6",
         "JSONPath": "^0.11.2",
         "lodash": "^4.17.21",
-        "node-fetch": "^3.3.2",
+        "node-fetch": "^2.6.0",
+        "nodemon": "^3.0.3",
         "path-to-regexp": "^6.2.1",
         "request": "^2.88.2"
     }
