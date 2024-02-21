@@ -19,7 +19,12 @@ const app = express();
 app.use(cors());
 
 // --------------------Routes-------------------- //
+const pocRouter = require('./poc');
+app.use('', pocRouter);
 
+app.post('/M/simple', (req, res) => {
+    res.send('Test Mock Simple Route Post');
+});
 
 // --------------------Create Server-------------------- //
 const port = 4500;
