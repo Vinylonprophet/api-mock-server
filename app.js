@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const axios = require('axios');
 const bodyParser = require('body-parser');
-const connectBusboy = require('connect-busboy');
+const busboy = require('connect-busboy');
 const cors = require('cors');
 const express = require('express');
 const fetch = require('node-fetch');
@@ -16,11 +16,39 @@ const urlRewrite = require('express-urlrewrite');
 
 // --------------------Configuration-------------------- //
 const app = express();
+const router = express.Router();
 app.use(cors());
 
 // --------------------Routes-------------------- //
+router.use((req, res, next) => {
+    res.setHeader('X-Custom-Header', 'Custom-Value');
+    res.setHeader('Date', new Date().toUTCString());
+    res.setHeader('Server', "VL's Server");
 
+    if (req.method === 'GET') {
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+    } else {
+        res.setHeader('Cache-Control', 'no-store');
+    }
 
+    next();
+});
+
+router.route('/api/example')
+    .get((req, res) => {
+        const responseData = { message: 'GET request handled' };
+        res.setHeader('Content-Type', 'text/plain');
+        res.status(200).json(responseData);
+    })
+    .post((req, res) => {
+        const responseData = { message: 'POST request handled' };
+        const responseBody = JSON.stringify(responseData);
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Length', Buffer.byteLength(responseBody));
+        res.status(200).json(responseData);
+    });
+
+app.use('', router);
 // --------------------Create Server-------------------- //
 const port = 4500;
 http.createServer(app).listen(port, '0.0.0.0', () => {
