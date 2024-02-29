@@ -3,6 +3,7 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 const busboy = require('connect-busboy');
 const cors = require('cors');
+const crypto = require('crypto');
 const express = require('express');
 const fetch = require('node-fetch');
 const fs = require('fs');
@@ -36,14 +37,29 @@ router.use((req, res, next) => {
 
 router.route('/api/example')
     .get((req, res) => {
-        const responseData = { message: 'GET request handled' };
+        // header
         res.setHeader('Content-Type', 'text/plain');
-        res.status(200).json(responseData);
+        // redirect
+        const redirectTarget = req.query.redirect;
+        console.log(redirectTarget)
+        // etag
+        const etagContent = "VL's ETAGContent";
+        const etag = crypto.createHash('md5').update(etagContent).digest('hex');
+        const ifNoneMatch = req.headers['if-none-match'];
+
+        if (ifNoneMatch === etag) {
+            res.status(304).end();
+        } else {
+            res.setHeader('ETag', etag);
+            const responseData = { message: 'GET request handled' };
+            res.status(200).json(responseData);
+        }
     })
     .post((req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+
         const responseData = { message: 'POST request handled' };
         const responseBody = JSON.stringify(responseData);
-        res.setHeader('Content-Type', 'application/json');
         res.setHeader('Content-Length', Buffer.byteLength(responseBody));
         res.status(200).json(responseData);
     });
