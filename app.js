@@ -22,6 +22,14 @@ app.use(cors());
 
 // --------------------Routes-------------------- //
 router.use((req, res, next) => {
+    // Access-Control-Allow
+    // res.setHeader('Access-Control-Allow-Origin', '*');
+    // // res.setHeader('Access-Control-Allow-Origin', 'https://www.google.com');
+    // res.setHeader('Access-Control-Allow-Headers', '*');
+    // // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, If-None-Match, Referer, Sec-Ch-Ua, Sec-Ch-Ua-Mobile, Sec-Ch-Ua-Platform, User-Agent');
+    // res.setHeader('Access-Control-Allow-Methods', '*');
+    // res.setHeader('Access-Control-Max-Age', '3600');
+
     res.setHeader('X-Custom-Header', 'Custom-Value');
     res.setHeader('Date', new Date().toUTCString());
     res.setHeader('Server', "VL's Server");
@@ -41,10 +49,11 @@ router.route('/api/example')
         res.setHeader('Content-Type', 'text/plain');
         // redirect
         const redirectTarget = req.query.redirect;
-        console.log(redirectTarget)
+        // console.log(redirectTarget)
         // etag
         const etagContent = "VL's ETAGContent";
         const etag = crypto.createHash('md5').update(etagContent).digest('hex');
+        console.log("ETag:", etag);
         const ifNoneMatch = req.headers['if-none-match'];
 
         if (ifNoneMatch === etag) {
