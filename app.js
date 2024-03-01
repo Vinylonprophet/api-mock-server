@@ -24,73 +24,18 @@ const corsOptions = {
     credentials: true,
 };
 app.use(cors(corsOptions));
+app.use(bodyParser.json());
 
 // --------------------Routes-------------------- //
-router.use((req, res, next) => {
-    // Access-Control-Allow
-    // res.setHeader('Access-Control-Allow-Origin', '*');
-    // // res.setHeader('Access-Control-Allow-Origin', 'https://www.google.com');
-    // res.setHeader('Access-Control-Allow-Headers', '*');
-    // // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, If-None-Match, Referer, Sec-Ch-Ua, Sec-Ch-Ua-Mobile, Sec-Ch-Ua-Platform, User-Agent');
-    // res.setHeader('Access-Control-Allow-Methods', '*');
-    // res.setHeader('Access-Control-Max-Age', '3600');
-    // res.setHeader('Access-Control-Allow-Credentials', 'true');
-    res.setHeader('Access-Control-Expose-Headers', 'Date');
+// router.use((req, res, next) => {
+//     next();
+// });
 
-    res.setHeader('X-Custom-Header', 'Custom-Value');
-    res.setHeader('Date', new Date().toUTCString());
-    res.setHeader('Server', "VL's Server");
-
-    if (req.method === 'GET') {
-        res.setHeader('Cache-Control', 'public, max-age=3600');
-    } else {
-        res.setHeader('Cache-Control', 'no-store');
-    }
-
-    next();
-});
-
-router.route('/api/example')
-    .get((req, res) => {
-        // header
-        res.setHeader('Content-Type', 'text/plain');
-
-        // redirect
-        const redirectTarget = req.query.redirect;
-
-        // etag
-        const etagContent = "VL's ETAGContent";
-        const etag = crypto.createHash('md5').update(etagContent).digest('hex');
-        const ifNoneMatch = req.headers['if-none-match'];
-
-        // Content-Disposition
-        res.setHeader('Content-Disposition', 'attachment; filename="example.txt"');
-
-        //  Set-Cookie
-        res.cookie('access-token', 'dream-legacy', { httpOnly: true, secure: true, sameSite: 'None' });
-
-        if (ifNoneMatch === etag) {
-            res.status(304).end();
-        } else if (redirectTarget === 'https://www.baidu.com') {
-            res.setHeader('Location', redirectTarget);
-            res.status(302).end();
-        } else {
-            res.setHeader('ETag', etag);
-            const responseData = { message: 'GET request handled' };
-            res.status(200).json(responseData);
-        }
-    })
-    .post((req, res) => {
-        res.setHeader('Content-Type', 'application/json');
-
-        // Content-Disposition for a downloadable JSON file
-        res.setHeader('Content-Disposition', 'attachment; filename="example.json"');
-
-        const responseData = { message: 'POST request handled' };
-        const responseBody = JSON.stringify(responseData);
-        res.setHeader('Content-Length', Buffer.byteLength(responseBody));
-        res.status(200).json(responseData);
-    });
+// router.route('')
+//     .get((req, res) => {
+//     })
+//     .post((req, res) => {
+//     });
 
 app.use('', router);
 // --------------------Create Server-------------------- //

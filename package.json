@@ -4,7 +4,8 @@
     "scripts": {
         "start": "node app.js",
         "local": "nodemon app.js",
-        "local:poc": "nodemon poc/app.js"
+        "local:beginner": "nodemon beginner/app.js",
+        "local:intermediate": "nodemon intermediate/app.js"
     },
     "dependencies": {
         "axios": "^1.6.7",

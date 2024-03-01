@@ -1,18 +1,24 @@
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
 const http = require('http');
 
 // --------------------Configuration-------------------- //
 const app = express();
-app.use(cors());
+const router = express.Router();
+
+app.use(bodyParser.json());
+
+// ==================== CORS MiddleWare ====================
+// const corsOptions = {
+//     origin: 'https://www.google.com',
+//     credentials: true,
+// };
+// app.use(cors(corsOptions));
 
 // --------------------Routes-------------------- //
-const pocRouter = require('./poc');
-app.use('', pocRouter);
-
-app.post('/M/simple', (req, res) => {
-    res.send('Test Mock Simple Route Post');
-});
+const intermediateRouter = require('./intermediate-router.js');
+app.use('', intermediateRouter);
 
 // --------------------Create Server-------------------- //
 const port = 4500;
