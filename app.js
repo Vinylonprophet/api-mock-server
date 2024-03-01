@@ -18,7 +18,12 @@ const urlRewrite = require('express-urlrewrite');
 // --------------------Configuration-------------------- //
 const app = express();
 const router = express.Router();
-app.use(cors());
+
+const corsOptions = {
+    origin: 'https://www.google.com',
+    credentials: true,
+};
+app.use(cors(corsOptions));
 
 // --------------------Routes-------------------- //
 router.use((req, res, next) => {
@@ -29,6 +34,8 @@ router.use((req, res, next) => {
     // // res.setHeader('Access-Control-Allow-Headers', 'Content-Type, If-None-Match, Referer, Sec-Ch-Ua, Sec-Ch-Ua-Mobile, Sec-Ch-Ua-Platform, User-Agent');
     // res.setHeader('Access-Control-Allow-Methods', '*');
     // res.setHeader('Access-Control-Max-Age', '3600');
+    // res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Expose-Headers', 'Date');
 
     res.setHeader('X-Custom-Header', 'Custom-Value');
     res.setHeader('Date', new Date().toUTCString());
@@ -47,17 +54,26 @@ router.route('/api/example')
     .get((req, res) => {
         // header
         res.setHeader('Content-Type', 'text/plain');
+
         // redirect
         const redirectTarget = req.query.redirect;
-        // console.log(redirectTarget)
+
         // etag
         const etagContent = "VL's ETAGContent";
         const etag = crypto.createHash('md5').update(etagContent).digest('hex');
-        console.log("ETag:", etag);
         const ifNoneMatch = req.headers['if-none-match'];
+
+        // Content-Disposition
+        res.setHeader('Content-Disposition', 'attachment; filename="example.txt"');
+
+        //  Set-Cookie
+        res.cookie('access-token', 'dream-legacy', { httpOnly: true, secure: true, sameSite: 'None' });
 
         if (ifNoneMatch === etag) {
             res.status(304).end();
+        } else if (redirectTarget === 'https://www.baidu.com') {
+            res.setHeader('Location', redirectTarget);
+            res.status(302).end();
         } else {
             res.setHeader('ETag', etag);
             const responseData = { message: 'GET request handled' };
@@ -66,6 +82,9 @@ router.route('/api/example')
     })
     .post((req, res) => {
         res.setHeader('Content-Type', 'application/json');
+
+        // Content-Disposition for a downloadable JSON file
+        res.setHeader('Content-Disposition', 'attachment; filename="example.json"');
 
         const responseData = { message: 'POST request handled' };
         const responseBody = JSON.stringify(responseData);
