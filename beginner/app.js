@@ -10,7 +10,7 @@ app.use(cors());
 const beginnerRouter = require('./beginner-router');
 app.use('', beginnerRouter);
 
-app.post('/M/simple', (req, res) => {
+app.post('/beginner/simple', (req, res) => {
     res.send('Test Mock Simple Route Post');
 });
 
