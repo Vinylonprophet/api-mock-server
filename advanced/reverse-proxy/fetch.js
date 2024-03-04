@@ -1,10 +1,11 @@
 var getResponse = {
     proxy: function () {
-        fetch('http://localhost:4500/proxy/complex', {
-            method: 'POST',
+        fetch('http://localhost:4500/reverse-proxy', {
+            method: 'GET',
             headers: {
-                "Content-Type": "text/html"
-            }
+                "Content-Type": "application/json"
+            },
+            credentials: 'include'
         })
     }
 }

@@ -2,16 +2,23 @@ const express = require('express');
 const reverseProxyRouter = express.Router();
 const request = require('request');
 
-reverseProxyRouter.route('/proxy/complex').get((req, res) => {
-}).post((req, res) => {
+reverseProxyRouter.route('/reverse-proxy').get((req, res) => {
+    const body = {
+        example1,
+        example2
+    } = req.body;
+
+    body.example1 = 'example1';
+    body.exampl21 = 'example2';
+
     options = {
-        'method': 'POST',
+        'method': 'GET',
         'url': '',
         'proxy': '',
         'json': true,
-        // 'body': body,
+        'body': body,
         'headers': {
-            'refer': '',
+            'referer': '',
             Accept: "application/json",
         }
     }
@@ -19,9 +26,13 @@ reverseProxyRouter.route('/proxy/complex').get((req, res) => {
     request(options, function (error, response) {
         if (error) {
             console.log("Error: ", error);
+            res.status(500).send("Internal Server Error");
         } else {
-            console.log("VL", response.body);
-            res.status(400).send(response.body);
+            let resCookies = response.headers['set-cookie'];
+            resCookies.forEach(cookie => {
+                res.append('Set-Cookie', `${cookie}; SameSite=None; Secure`);
+            });
+            res.status(200).send(response.body);
         }
     })
 });

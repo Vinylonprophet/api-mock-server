@@ -1,10 +1,16 @@
+const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
 const http = require('http');
 
 // --------------------Configuration-------------------- //
 const app = express();
-app.use(cors());
+app.use(bodyParser.json());
+const corsOptions = {
+    origin: 'https://www.google.com',
+    credentials: true,
+};
+app.use(cors(corsOptions));
 
 // --------------------Routes-------------------- //
 const reverseProxy = require('./reverse-proxy/reverse-proxy-router');
