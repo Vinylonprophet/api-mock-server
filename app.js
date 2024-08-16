@@ -19,12 +19,14 @@ const urlRewrite = require('express-urlrewrite');
 const app = express();
 const router = express.Router();
 
-const corsOptions = {
-    origin: 'https://www.google.com',
-    credentials: true,
-};
-app.use(cors(corsOptions));
+// const corsOptions = {
+//     origin: 'https://www.google.com',
+//     credentials: true,
+// };
+// app.use(cors(corsOptions));
+app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, '/')));
 
 // --------------------Routes-------------------- //
 // router.use((req, res, next) => {
