@@ -3,7 +3,7 @@ const { ObjectId } = require('mongodb');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
 const app = express();
-const port = 3000;
+const port = 4500;
 
 const uri = 'mongodb://127.0.0.1:27017';
 const client = new MongoClient(uri);
@@ -11,9 +11,34 @@ const client = new MongoClient(uri);
 app.use(cors());
 app.use(express.json());
 
-app.get('/v1/getCollectionCount', async (req, res) => {
+let database;
+
+// 服务器启动时连接数据库
+async function connectToDB() {
     try {
         await client.connect();
+        database = client.db('crawler');
+        console.log('Connected successfully to MongoDB');
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+        process.exit(1); // 退出进程，表示连接失败
+    }
+}
+
+// 服务器关闭时关闭数据库连接
+process.on('SIGINT', async () => {
+    try {
+        await client.close();
+        console.log('Disconnected from MongoDB');
+        process.exit(0); // 正常退出进程
+    } catch (error) {
+        console.error('Error disconnecting from MongoDB:', error);
+        process.exit(1); // 退出进程，表示关闭失败
+    }
+});
+
+app.get('/v1/getCollectionCount', async (req, res) => {
+    try {
         const { collectionName, queryParams = {} } = req.query;
 
         let query = queryParams;
@@ -25,16 +50,12 @@ app.get('/v1/getCollectionCount', async (req, res) => {
             }
         }
 
-        const database = client.db('crawler');
         const collection = database.collection(collectionName);
-
         const count = await collection.countDocuments(query);
 
         res.json({ collectionName, documentCount: count });
     } catch (error) {
         res.status(500).json({ error: error.message });
-    } finally {
-        await client.close();
     }
 });
 
@@ -55,10 +76,7 @@ app.get('/v1/dataQuery', async (req, res) => {
     }
 
     try {
-        await client.connect();
-        const database = client.db('crawler');
         const collection = database.collection(collectionName);
-
         const sortOrder = sort === 'asc' ? 1 : -1;
 
         const games = await collection.find(query)
@@ -70,8 +88,6 @@ app.get('/v1/dataQuery', async (req, res) => {
         res.json(games);
     } catch (error) {
         res.status(500).json({ error: error.message });
-    } finally {
-        await client.close();
     }
 });
 
@@ -82,10 +98,7 @@ app.post('/v1/syncDBStatus', async (req, res) => {
     }
 
     try {
-        await client.connect();
-        const database = client.db('crawler');
         const collection = database.collection(collectionName);
-
         const filter = { _id: new ObjectId(id) };
         const updateDoc = {
             $set: { 'db_status': "DB_SYNC" },
@@ -100,11 +113,11 @@ app.post('/v1/syncDBStatus', async (req, res) => {
         res.status(200).json({ message: 'Property updated successfully', result, status: 200 });
     } catch (error) {
         res.status(500).json({ error: error.message });
-    } finally {
-        await client.close();
     }
 });
 
-app.listen(4500, () => {
-    console.log(`Server running at http://localhost:${4500}`);
+// 启动服务器并连接数据库
+app.listen(port, async () => {
+    await connectToDB();
+    console.log(`Server running at http://localhost:${port}`);
 });
