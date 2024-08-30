@@ -92,7 +92,7 @@ app.get('/v1/dataQuery', async (req, res) => {
 });
 
 app.post('/v1/syncDBStatus', async (req, res) => {
-    const { collectionName, id } = req.body;
+    const { collectionName, id, isPending = false } = req.body;
     if (!collectionName || !id) {
         return res.status(400).json({ error: 'Collection name and id are required' });
     }
@@ -100,9 +100,18 @@ app.post('/v1/syncDBStatus', async (req, res) => {
     try {
         const collection = database.collection(collectionName);
         const filter = { _id: new ObjectId(id) };
-        const updateDoc = {
+        let updateDoc = {
             $set: { 'db_status': "DB_SYNC" },
         };
+        if (isPending) {
+            updateDoc = {
+                $set: { 'db_status': "PENDING" },
+            };
+        } else {
+            updateDoc = {
+                $set: { 'db_status': "DB_SYNC" },
+            };
+        }
 
         const result = await collection.updateOne(filter, updateDoc);
 
@@ -115,6 +124,22 @@ app.post('/v1/syncDBStatus', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+app.post('/v1/getArticleDetail', async (req, res) => {
+    const { title } = req.body;
+
+    if (title !== '') {
+        try {
+            data = require('./articles/' + title + '.json')
+            return res.status(200).json({ status: 200, data: data });
+        } catch (e) {
+            return res.status(400);
+        }
+    } else {
+        return res.status(400);
+    }
+});
+
 
 // 启动服务器并连接数据库
 app.listen(port, async () => {

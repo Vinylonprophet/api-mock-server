@@ -1,0 +1,15 @@
+{
+    "type": "Article",
+    "recordDate": "2024-08-23T00:00:00",
+    "title": "om后台JSON配置",
+    "tags": [
+        "Guide",
+        "Config-File"
+    ],
+    "author": {
+        "avatar": "assets/author/VL_avatar.jpg",
+        "name": "VL"
+    },
+    "introduce": "使用前必读",
+    "link": "assets/articles/om后台JSON配置.md"
+}
