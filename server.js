@@ -13,7 +13,6 @@ app.use(express.json());
 
 let database;
 
-// 服务器启动时连接数据库
 async function connectToDB() {
     try {
         await client.connect();
@@ -21,19 +20,18 @@ async function connectToDB() {
         console.log('Connected successfully to MongoDB');
     } catch (error) {
         console.error('Error connecting to MongoDB:', error);
-        process.exit(1); // 退出进程，表示连接失败
+        process.exit(1);
     }
 }
 
-// 服务器关闭时关闭数据库连接
 process.on('SIGINT', async () => {
     try {
         await client.close();
         console.log('Disconnected from MongoDB');
-        process.exit(0); // 正常退出进程
+        process.exit(0);
     } catch (error) {
         console.error('Error disconnecting from MongoDB:', error);
-        process.exit(1); // 退出进程，表示关闭失败
+        process.exit(1);
     }
 });
 
@@ -140,8 +138,6 @@ app.post('/v1/getArticleDetail', async (req, res) => {
     }
 });
 
-
-// 启动服务器并连接数据库
 app.listen(port, async () => {
     await connectToDB();
     console.log(`Server running at http://localhost:${port}`);
